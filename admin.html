@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>JayDs Kitchen — Admin Portal</title>
+<link rel="icon" href="logo.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070a0b;--bg-2:#0d1112;--panel:#141a1c;--panel-2:#1a2225;--panel-3:#212b2f;
+  --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --text:#eef3f3;--muted:#8b9a9c;--muted-2:#5f6f71;
+  --accent:#2ee6c5;--accent-2:#0fb9a0;--accent-soft:rgba(46,230,197,.11);--accent-line:rgba(46,230,197,.35);
+  --warn:#ffc15e;--danger:#ff7a7a;--ok:#4ade80;--info:#7cc4ff;
+  --radius:14px;--radius-sm:10px;--radius-xs:8px;
+  --sidebar-w:250px;--topbar-h:64px;
+  --font:'Inter',system-ui,sans-serif;
+  --shadow:0 20px 50px -20px rgba(0,0,0,.9);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button,input,select,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;border:none;background:none;}
+h1,h2,h3{font-weight:700;line-height:1.2;letter-spacing:-.01em;margin:0;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:var(--panel-3);border-radius:99px;border:2px solid var(--bg-2);}
+.login-screen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:radial-gradient(900px 600px at 50% 0%,rgba(46,230,197,.10),transparent 55%),var(--bg);padding:24px;}
+.login-card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:40px 34px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2),transparent);}
+.login-logo{width:62px;height:62px;border-radius:18px;background:linear-gradient(140deg,var(--accent),var(--accent-2));display:grid;place-items:center;overflow:hidden;font-size:1.7rem;font-weight:800;color:#04120f;margin-bottom:22px;box-shadow:0 14px 30px -12px rgba(46,230,197,.7);position:relative;}
+.login-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.login-card h1{font-size:1.6rem;font-weight:800;margin-bottom:6px;}
+.login-card>p{color:var(--muted);font-size:.9rem;margin:0 0 28px;}
+.login-field{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.login-field label{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.login-field input{width:100%;padding:14px 16px;border-radius:var(--radius-sm);background:var(--bg-2);border:1.5px solid var(--line);color:var(--text);font-size:.95rem;transition:all .2s;}
+.login-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,230,197,.14);}
+.login-err{display:none;padding:11px 14px;border-radius:var(--radius-xs);background:rgba(255,122,122,.1);border:1px solid rgba(255,122,122,.35);color:#ffc7c7;font-size:.85rem;margin-bottom:16px;}
+.login-err.show{display:block;}
+.login-hint{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted-2);line-height:1.6;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;background:var(--accent);color:#04120f;border:1px solid transparent;transition:transform .18s var(--ease),box-shadow .18s;white-space:nowrap;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px -10px rgba(46,230,197,.6);}
+.btn--block{width:100%;}
+.btn--ghost{background:transparent;color:var(--text);border:1.5px solid var(--line-2);}
+.btn--ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;}
+.btn--danger{background:rgba(255,122,122,.15);color:var(--danger);border:1px solid rgba(255,122,122,.35);}
+.btn--danger:hover{background:var(--danger);color:#220a0a;}
+.btn--sm{padding:8px 14px;font-size:.8rem;border-radius:8px;}
+.btn--xs{padding:6px 11px;font-size:.74rem;border-radius:7px;}
+.btn--wa{background:#25D366;color:#04220f;}
+.btn[disabled]{opacity:.4;pointer-events:none;}
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;}
+.app.hidden{display:none;}
+.sidebar{background:var(--bg-2);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar__brand{display:flex;align-items:center;gap:11px;padding:18px 20px;border-bottom:1px solid var(--line);flex:none;}
+.sidebar__mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(140deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-size:1.1rem;font-weight:800;color:#04120f;overflow:hidden;position:relative;flex:none;}
+.sidebar__mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.sidebar__name{font-weight:800;font-size:.95rem;line-height:1.2;}
+.sidebar__name small{display:block;font-weight:500;font-size:.7rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:1px;}
+.sidebar__nav{flex:1;overflow-y:auto;padding:12px 10px;}
+.nav-group{margin-bottom:14px;}
+.nav-group__label{padding:8px 12px 6px;font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:9px;font-size:.86rem;font-weight:600;color:var(--muted);transition:all .18s var(--ease);position:relative;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);}
+.nav-item.active::before{content:"";position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:99px;background:var(--accent);}
+.nav-item svg{flex:none;opacity:.85;}
+.nav-item__badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--panel-3);color:var(--muted);font-size:.68rem;font-weight:700;display:grid;place-items:center;}
+.nav-item__badge--warn{background:rgba(255,193,94,.2);color:var(--warn);}
+.nav-item.active .nav-item__badge{background:rgba(46,230,197,.2);color:var(--accent);}
+.sidebar__foot{flex:none;padding:14px;border-top:1px solid var(--line);display:grid;gap:8px;}
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{flex:none;height:var(--topbar-h);display:flex;align-items:center;gap:16px;padding:0 24px;background:rgba(7,10,11,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+.topbar__menu-btn{display:none;}
+.topbar__title{font-size:1.05rem;font-weight:700;}
+.topbar__title small{display:block;font-weight:500;font-size:.74rem;color:var(--muted);margin-top:1px;}
+.topbar__spacer{flex:1;}
+.topbar__actions{display:flex;align-items:center;gap:10px;}
+.save-state{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;font-size:.75rem;font-weight:700;background:rgba(74,222,128,.12);color:var(--ok);border:1px solid rgba(74,222,128,.28);transition:all .25s;}
+.save-state.dirty{background:rgba(255,193,94,.12);color:var(--warn);border-color:rgba(255,193,94,.3);}
+.save-state::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+.save-state.dirty::before{animation:blink 1.4s infinite;}
+@keyframes blink{50%{opacity:.3;}}
+.content{flex:1;overflow-y:auto;padding:26px 24px 80px;}
+.view{display:none;max-width:1000px;margin:0 auto;}
+.view.active{display:block;animation:viewIn .3s var(--ease);}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.view-head{margin-bottom:24px;}
+.view-head h1{font-size:1.7rem;font-weight:800;margin-bottom:6px;}
+.view-head p{color:var(--muted);font-size:.9rem;margin:0;max-width:62ch;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:18px;}
+.card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.card__title{font-size:.95rem;font-weight:700;}
+.card__title small{display:block;font-weight:500;font-size:.78rem;color:var(--muted);margin-top:3px;}
+.card__actions{display:flex;gap:8px;flex-wrap:wrap;}
+.grid{display:grid;gap:16px;}
+.grid--2{grid-template-columns:1fr 1fr;}
+.grid--3{grid-template-columns:repeat(3,1fr);}
+@media (max-width:720px){.grid--2,.grid--3{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:7px;}
+.field label{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.field label .tip{margin-left:auto;font-weight:500;letter-spacing:0;text-transform:none;font-size:.7rem;color:var(--muted-2);}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:9px;background:var(--bg-2);border:1.5px solid var(--line);color:var(--text);font-size:.9rem;transition:border-color .18s,box-shadow .18s;}
+.field textarea{resize:vertical;min-height:80px;font-family:var(--font);line-height:1.55;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,230,197,.12);}
+.field .help{font-size:.72rem;color:var(--muted-2);line-height:1.5;}
+.check{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg-2);border:1.5px solid var(--line);cursor:pointer;font-size:.86rem;}
+.check input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex:none;}
+.check.on{border-color:var(--accent-line);background:var(--accent-soft);}
+.img-field{display:flex;gap:14px;align-items:flex-start;padding:12px;border-radius:var(--radius-sm);background:var(--bg-2);border:1.5px solid var(--line);}
+.img-field__preview{width:78px;height:78px;border-radius:10px;overflow:hidden;flex:none;background:linear-gradient(135deg,#1d2427,#141a1c);display:grid;place-items:center;color:var(--muted-2);font-size:.62rem;text-align:center;border:1px solid var(--line);}
+.img-field__preview img{width:100%;height:100%;object-fit:cover;}
+.img-field__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
+.img-field__body input{width:100%;padding:9px 12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--line);color:var(--text);font-size:.82rem;}
+.img-field__body input:focus{outline:none;border-color:var(--accent);}
+.img-field__row{display:flex;gap:6px;flex-wrap:wrap;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+@media (max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:500px){.stat-grid{grid-template-columns:1fr;}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:.5;}
+.stat__label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.stat__value{font-size:1.9rem;font-weight:800;line-height:1;margin-bottom:6px;}
+.stat__meta{font-size:.78rem;color:var(--muted);}
+.stat--warn .stat__value{color:var(--warn);}
+.stat--ok .stat__value{color:var(--ok);}
+.stat--info .stat__value{color:var(--info);}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.action-tile{display:flex;align-items:center;gap:12px;padding:16px;border-radius:var(--radius-sm);background:var(--panel);border:1px solid var(--line);text-align:left;transition:all .2s var(--ease);}
+.action-tile:hover{border-color:var(--accent-line);background:var(--accent-soft);transform:translateY(-2px);}
+.action-tile__icon{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
+.action-tile__body strong{display:block;font-size:.88rem;font-weight:700;}
+.action-tile__body small{display:block;font-size:.76rem;color:var(--muted);margin-top:2px;}
+.cat-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.cat-head{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--panel-2);border-bottom:1px solid var(--line);}
+.cat-head__name{flex:1;font-weight:700;font-size:.95rem;background:transparent;border:none;color:var(--text);padding:6px 8px;border-radius:7px;letter-spacing:.05em;text-transform:uppercase;}
+.cat-head__name:focus{outline:none;background:var(--bg-2);}
+.cat-head__count{font-size:.74rem;color:var(--muted);padding:4px 10px;background:var(--bg-2);border-radius:99px;font-weight:600;}
+.cat-head__actions{display:flex;gap:5px;}
+.cat-body{padding:16px 18px;}
+.dish-row{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;}
+.dish-row__head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.dish-row__num{width:24px;height:24px;border-radius:7px;flex:none;background:var(--panel-3);color:var(--muted);display:grid;place-items:center;font-size:.72rem;font-weight:800;}
+.dish-row__name{flex:1;font-weight:700;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dish-row__actions{display:flex;gap:4px;}
+.icon-btn{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none;border:1px solid var(--line);color:var(--muted);transition:all .16s;}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.icon-btn--danger:hover{border-color:var(--danger);color:var(--danger);}
+.icon-btn:disabled{opacity:.3;pointer-events:none;}
+.hours-row{display:grid;grid-template-columns:140px 1fr 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:var(--radius-sm);background:var(--bg-2);border:1px solid var(--line);margin-bottom:10px;}
+.hours-row input[type="text"]{width:100%;padding:9px 12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--line);color:var(--text);font-size:.85rem;}
+.hours-row input[type="text"]:focus{outline:none;border-color:var(--accent);}
+@media (max-width:640px){.hours-row{grid-template-columns:1fr 1fr;gap:8px;}.hours-row__day{grid-column:span 2;}.hours-row .check{grid-column:span 2;}}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.gallery-tile{border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-2);border:1px solid var(--line);}
+.gallery-tile__img{aspect-ratio:1/1;background:linear-gradient(135deg,#1d2427,#141a1c);display:grid;place-items:center;color:var(--muted-2);font-size:.7rem;text-align:center;padding:16px;}
+.gallery-tile__img img{width:100%;height:100%;object-fit:cover;}
+.gallery-tile__body{padding:12px;}
+.gallery-tile__body input{width:100%;padding:7px 10px;border-radius:7px;background:var(--bg);border:1px solid var(--line);color:var(--text);font-size:.78rem;margin-bottom:8px;}
+.gallery-tile__body input:focus{outline:none;border-color:var(--accent);}
+.gallery-tile__actions{display:flex;gap:4px;justify-content:flex-end;}
+.list-row{display:grid;gap:12px;padding:14px;border-radius:var(--radius-sm);background:var(--bg-2);border:1px solid var(--line);margin-bottom:10px;}
+.list-row__head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.list-row__label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.list-row__actions{display:flex;gap:4px;}
+.order-card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.order-card:hover{border-color:var(--line-2);}
+.order-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.order-card__ref{font-family:monospace;font-size:.82rem;font-weight:700;color:var(--accent);letter-spacing:.02em;}
+.order-card__meta{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.order-card__amount{font-size:1.15rem;font-weight:800;color:var(--text);}
+.order-card__body{display:grid;gap:8px;font-size:.85rem;color:var(--muted);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line);}
+.order-card__items{display:grid;gap:4px;font-size:.85rem;}
+.order-card__actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.status-pill--new{background:rgba(124,196,255,.15);color:var(--info);}
+.status-pill--awaiting{background:rgba(255,193,94,.15);color:var(--warn);}
+.status-pill--paid{background:rgba(74,222,128,.15);color:var(--ok);}
+.status-pill--ready{background:rgba(46,230,197,.15);color:var(--accent);}
+.status-pill--collected{background:rgba(255,255,255,.06);color:var(--muted);}
+.status-pill--cancelled{background:rgba(255,122,122,.15);color:var(--danger);}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:600;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
+.toast{display:flex;align-items:center;gap:11px;padding:13px 18px;border-radius:12px;background:var(--panel-2);border:1px solid var(--accent-line);color:var(--text);font-size:.85rem;font-weight:600;box-shadow:var(--shadow);transform:translateX(120%);opacity:0;transition:all .35s var(--ease);pointer-events:auto;max-width:360px;}
+.toast.show{transform:translateX(0);opacity:1;}
+.toast--ok svg{color:var(--ok);}
+.toast--warn{border-color:rgba(255,193,94,.4);}
+.toast--warn svg{color:var(--warn);}
+.toast--err{border-color:rgba(255,122,122,.4);}
+.toast--err svg{color:var(--danger);}
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(5,7,7,.8);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:22px;}
+.modal-overlay.open{display:flex;}
+.modal{width:100%;max-width:480px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);}
+.modal h3{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
+.modal p{color:var(--muted);font-size:.88rem;margin:0 0 22px;}
+.modal__actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+.hint{font-size:.76rem;color:var(--muted-2);line-height:1.55;margin:10px 0 0;padding:10px 12px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);}
+.empty-state{padding:44px 22px;text-align:center;border:1.5px dashed var(--line-2);border-radius:var(--radius-sm);color:var(--muted);}
+.sidebar-backdrop{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);}
+.sidebar-backdrop.open{display:block;}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:270px;z-index:100;transform:translateX(-102%);transition:transform .32s var(--ease);}
+  .sidebar.open{transform:translateX(0);}
+  .topbar__menu-btn{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);color:var(--text);}
+  .content{padding:20px 16px 70px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <form class="login-card" id="loginForm">
+    <div class="login-logo" id="loginLogo"><span>J</span><img src="logo.jpeg" alt="" onerror="this.style.display='none'"></div>
+    <h1>Admin Portal</h1>
+    <p>Sign in to manage JayDs Kitchen.</p>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-field"><label for="email">Email</label><input type="email" id="email" placeholder="owner@jaydskitchen.co.za" autocomplete="username" autofocus></div>
+    <div class="login-field"><label for="pw">Password</label><input type="password" id="pw" placeholder="••••••••" autocomplete="current-password"></div>
+    <button type="submit" class="btn btn--block" id="loginSubmit">Sign In</button>
+    <div class="login-hint">Use the email and password from the Firebase Console under <strong>Authentication → Users</strong>.</div>
+  </form>
+</div>
+
+<div class="app hidden" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__mark" id="sidebarMark"><span>J</span><img src="logo.jpeg" alt="" onerror="this.style.display='none'"></div>
+      <div class="sidebar__name">JayDs Kitchen<small>Admin</small></div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="nav-group">
+        <div class="nav-group__label">Overview</div>
+        <button class="nav-item active" data-view="dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</button>
+        <button class="nav-item" data-view="orders"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Orders<span class="nav-item__badge" id="ordersBadge">0</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group__label">Content</div>
+        <button class="nav-item" data-view="business"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg>Business Info</button>
+        <button class="nav-item" data-view="bank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01M9 17h.01M15 17h.01"/></svg>Bank Details</button>
+        <button class="nav-item" data-view="hero"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Hero Section</button>
+        <button class="nav-item" data-view="menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Menu<span class="nav-item__badge" id="menuBadge">0</span></button>
+        <button class="nav-item" data-view="hours"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Opening Hours</button>
+        <button class="nav-item" data-view="gallery"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Gallery<span class="nav-item__badge" id="galleryBadge">0</span></button>
+        <button class="nav-item" data-view="about"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>About Us</button>
+        <button class="nav-item" data-view="social"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>Social Links</button>
+        <button class="nav-item" data-view="reviews"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Reviews</button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group__label">System</div>
+        <button class="nav-item" data-view="backup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Backup</button>
+      </div>
+    </nav>
+    <div class="sidebar__foot">
+      <a href="index.html" target="_blank" class="btn btn--ghost btn--sm" style="width:100%">View Public Site</a>
+      <button class="btn btn--ghost btn--sm" id="logoutBtn" style="width:100%">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="topbar__menu-btn" id="menuBtn" aria-label="Toggle navigation"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="topbar__title" id="viewTitle">Dashboard<small id="viewSub">Overview of your site</small></div>
+      <div class="topbar__spacer"></div>
+      <div class="topbar__actions">
+        <span class="save-state" id="saveState">Saved</span>
+        <button class="btn btn--sm" id="saveBtn">Save Changes</button>
+      </div>
+    </header>
+
+    <main class="content" id="content">
+      <section class="view active" data-view="dashboard">
+        <div class="view-head"><h1>Dashboard</h1><p>A quick overview of your JayDs Kitchen website.</p></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="stat__label">Menu Items</div><div class="stat__value" id="statDishes">0</div><div class="stat__meta" id="statDishesMeta">3 categories</div></div>
+          <div class="stat stat--info"><div class="stat__label">New Orders</div><div class="stat__value" id="statNewOrders">0</div><div class="stat__meta">Awaiting confirmation</div></div>
+          <div class="stat stat--warn"><div class="stat__label">Awaiting Payment</div><div class="stat__value" id="statAwaiting">0</div><div class="stat__meta">Proof of payment pending</div></div>
+          <div class="stat"><div class="stat__label">Gallery Photos</div><div class="stat__value" id="statGallery">0</div><div class="stat__meta">Images published</div></div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Quick actions</div></div>
+          <div class="action-grid">
+            <button class="action-tile" data-goto="orders"><div class="action-tile__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="action-tile__body"><strong>View Orders</strong><small>New, paid, ready</small></div></button>
+            <button class="action-tile" data-goto="menu"><div class="action-tile__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div><div class="action-tile__body"><strong>Edit Menu</strong><small>KOTA · FOOD · BEVERAGES</small></div></button>
+            <button class="action-tile" data-goto="bank"><div class="action-tile__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div><div class="action-tile__body"><strong>Bank Details</strong><small>EFT information</small></div></button>
+            <button class="action-tile" data-goto="business"><div class="action-tile__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div><div class="action-tile__body"><strong>Business Details</strong><small>Phone, address, logo</small></div></button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__head">
+            <div class="card__title">📸 Image Storage Test<small>Verify Cloudinary uploads are working</small></div>
+            <div class="card__actions"><button class="btn btn--sm" data-action="testCloudinary">Run upload test</button></div>
+          </div>
+          <div id="cloudinaryTestResult" style="font-size:.85rem;color:var(--muted)">
+            Click "Run upload test" to upload a small test image and confirm your Cloudinary configuration works.
+          </div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Setup checklist</div></div><div id="launchChecklist"></div></div>
+      </section>
+
+      <section class="view" data-view="orders">
+        <div class="view-head"><h1>Orders</h1><p>All orders placed through the website, in real time.</p></div>
+        <div class="card">
+          <div class="card__head">
+            <div class="card__title">Orders<small id="ordersCount">Loading…</small></div>
+            <div class="card__actions"><button class="btn btn--ghost btn--sm" data-action="refreshOrders">Refresh</button></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+            <button class="btn btn--ghost btn--xs order-filter active" data-filter="all">All</button>
+            <button class="btn btn--ghost btn--xs order-filter" data-filter="new">New</button>
+            <button class="btn btn--ghost btn--xs order-filter" data-filter="awaiting">Awaiting payment</button>
+            <button class="btn btn--ghost btn--xs order-filter" data-filter="paid">Paid</button>
+            <button class="btn btn--ghost btn--xs order-filter" data-filter="ready">Ready</button>
+            <button class="btn btn--ghost btn--xs order-filter" data-filter="collected">Completed</button>
+          </div>
+          <div id="ordersList"></div>
+        </div>
+      </section>
+
+      <section class="view" data-view="business">
+        <div class="view-head"><h1>Business Information</h1><p>Name, logo, phone number, address and location.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title">Identity</div></div>
+          <div class="grid grid--2">
+            <div class="field"><label>Business name</label><input type="text" data-bind="business.name"></div>
+            <div class="field"><label>Highlighted word</label><input type="text" data-bind="business.nameAccent"></div>
+          </div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Logo</div></div>
+          <div class="img-field" data-img="business.logo">
+            <div class="img-field__preview" data-img-preview>no image</div>
+            <div class="img-field__body">
+              <input type="text" data-bind="business.logo" placeholder="logo.jpeg or https://...">
+              <div class="img-field__row">
+                <button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="business.logo">📷 Upload</button>
+                <button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="business.logo">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Contact</div></div>
+          <div class="grid grid--2">
+            <div class="field"><label>Phone (display)</label><input type="text" data-bind="business.phoneDisplay"></div>
+            <div class="field"><label>Phone (tel: link)</label><input type="text" data-bind="business.phoneTel"></div>
+          </div>
+          <div class="field" style="margin-top:16px"><label>WhatsApp (international, digits only)</label><input type="text" data-bind="business.whatsapp"><div class="help">Example: 27715739783</div></div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Address</div></div>
+          <div class="field" style="margin-bottom:16px"><label>Street</label><input type="text" data-bind="business.address.street"></div>
+          <div class="grid grid--2">
+            <div class="field"><label>City</label><input type="text" data-bind="business.address.city"></div>
+            <div class="field"><label>Province</label><input type="text" data-bind="business.address.province"></div>
+          </div>
+          <div class="grid grid--2" style="margin-top:16px">
+            <div class="field"><label>Postal code</label><input type="text" data-bind="business.address.postal"></div>
+            <div class="field"><label>Country</label><input type="text" data-bind="business.address.country"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__head">
+            <div class="card__title">Location &amp; Map<small>Google Maps link and location photos</small></div>
+          </div>
+          <div class="field" style="margin-bottom:16px">
+            <label>Google Maps link</label>
+            <input type="text" data-bind="contact.mapUrl" placeholder="https://maps.app.goo.gl/...">
+            <div class="help">Paste the "Share" link from Google Maps. Customers tap "Directions" to open it.</div>
+          </div>
+          <div class="grid grid--2">
+            <div>
+              <div class="field" style="margin-bottom:10px"><label>Location photo 1</label></div>
+              <div class="img-field" data-img="contact.locationImage">
+                <div class="img-field__preview" data-img-preview>no image</div>
+                <div class="img-field__body">
+                  <input type="text" data-bind="contact.locationImage" placeholder="location.jpeg">
+                  <div class="img-field__row">
+                    <button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="contact.locationImage">📷 Upload</button>
+                    <button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="contact.locationImage">Clear</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="field" style="margin-bottom:10px"><label>Location photo 2</label></div>
+              <div class="img-field" data-img="contact.locationImage2">
+                <div class="img-field__preview" data-img-preview>no image</div>
+                <div class="img-field__body">
+                  <input type="text" data-bind="contact.locationImage2" placeholder="location2.jpeg">
+                  <div class="img-field__row">
+                    <button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="contact.locationImage2">📷 Upload</button>
+                    <button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="contact.locationImage2">Clear</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hint">Both photos appear in the map area. Visitors can tap "Switch view" to toggle between them.</div>
+        </div>
+        <div class="card" style="border-color:rgba(46,230,197,.3)">
+          <div class="card__head">
+            <div class="card__title">Image Storage (Cloudinary)<small>Free image hosting — required for uploading photos</small></div>
+            <div class="card__actions"><button class="btn btn--ghost btn--sm" data-action="testCloudinary">Test upload</button></div>
+          </div>
+          <div class="grid grid--2">
+            <div class="field">
+              <label>Cloud name</label>
+              <input type="text" data-bind="config.cloudinary.cloudName" placeholder="e.g. fstqzsn5">
+              <div class="help">From your Cloudinary dashboard top-left.</div>
+            </div>
+            <div class="field">
+              <label>Upload preset name</label>
+              <input type="text" data-bind="config.cloudinary.uploadPreset" placeholder="e.g. jayds_unsigned">
+              <div class="help">Must be set to "Unsigned" in Cloudinary.</div>
+            </div>
+          </div>
+          <div class="hint">
+            <strong>Setup:</strong> Sign up free at
+            <a href="https://cloudinary.com/users/register_free" target="_blank" rel="noopener" style="color:var(--accent)">cloudinary.com</a>,
+            copy your Cloud name from the dashboard, then create an <em>Unsigned</em> upload preset under Settings → Upload → Upload presets.
+          </div>
+        </div>
+      </section>
+
+      <section class="view" data-view="bank">
+        <div class="view-head"><h1>Bank Details</h1><p>Customers see these details after placing an order.</p></div>
+        <div class="card">
+          <div class="card__head"><div class="card__title">Bank account</div></div>
+          <div class="grid grid--2">
+            <div class="field"><label>Bank name</label><input type="text" data-bind="business.bank.bankName" placeholder="e.g. FNB, Standard Bank, Capitec"></div>
+            <div class="field"><label>Account holder</label><input type="text" data-bind="business.bank.accountName" placeholder="Name on the account"></div>
+          </div>
+          <div class="grid grid--2" style="margin-top:16px">
+            <div class="field"><label>Account number</label><input type="text" data-bind="business.bank.accountNumber"></div>
+            <div class="field"><label>Branch code</label><input type="text" data-bind="business.bank.branchCode"></div>
+          </div>
+          <div class="grid grid--2" style="margin-top:16px">
+            <div class="field"><label>Account type</label><input type="text" data-bind="business.bank.accountType" placeholder="e.g. Cheque, Savings"></div>
+            <div class="field"><label>Reference prefix</label><input type="text" data-bind="business.bank.referencePrefix" placeholder="JDK"></div>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Payment instructions shown to customers</label>
+            <textarea data-bind="business.bank.instructions" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__head"><div class="card__title">Preview<small>How the bank card appears to customers</small></div></div>
+          <div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px">
+            <h4 style="font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 14px">Bank details for EFT</h4>
+            <div id="bankPreview"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" data-view="hero">
+        <div class="view-head"><h1>Hero Section</h1><p>The first thing customers see.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title">Text</div></div>
+          <div class="field" style="margin-bottom:16px"><label>Eyebrow</label><input type="text" data-bind="hero.eyebrow"></div>
+          <div class="grid grid--2">
+            <div class="field"><label>Headline line 1</label><input type="text" data-bind="hero.headlineLine1"></div>
+            <div class="field"><label>Headline line 2</label><input type="text" data-bind="hero.headlineLine2"></div>
+          </div>
+          <div class="field" style="margin-top:16px"><label>Description</label><textarea data-bind="hero.lead" rows="4"></textarea></div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Images</div></div>
+          <div class="field" style="margin-bottom:10px"><label>Hero background</label></div>
+          <div class="img-field" data-img="hero.coverImage" style="margin-bottom:18px">
+            <div class="img-field__preview" data-img-preview>no image</div>
+            <div class="img-field__body"><input type="text" data-bind="hero.coverImage"><div class="img-field__row"><button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="hero.coverImage">📷 Upload</button><button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="hero.coverImage">Clear</button></div></div>
+          </div>
+          <div class="field" style="margin-bottom:10px"><label>Order section image</label></div>
+          <div class="img-field" data-img="hero.sideImage">
+            <div class="img-field__preview" data-img-preview>no image</div>
+            <div class="img-field__body"><input type="text" data-bind="hero.sideImage"><div class="img-field__row"><button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="hero.sideImage">📷 Upload</button><button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="hero.sideImage">Clear</button></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" data-view="menu">
+        <div class="view-head">
+          <h1>Menu</h1>
+          <p>Your menu has <strong>3 fixed categories</strong>: KOTA, FOOD, and BEVERAGES. Add dishes to each one, set prices and upload photos.</p>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Menu notice<small>Optional banner above the menu on the public site</small></div></div><div class="field"><textarea data-bind="menuNotice" rows="2" placeholder="Leave empty to hide the banner"></textarea></div></div>
+        <div id="menuEditor"></div>
+      </section>
+
+      <section class="view" data-view="hours">
+        <div class="view-head"><h1>Opening Hours</h1><p>Tick "Confirmed" for days you've verified.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title">Weekly schedule</div></div><div id="hoursEditor"></div></div>
+      </section>
+
+      <section class="view" data-view="gallery">
+        <div class="view-head"><h1>Gallery</h1><p>Photos of your food, kitchen and premises.</p></div>
+        <div class="card">
+          <div class="card__head"><div class="card__title">Photos<small id="galleryCount">0 photos</small></div><div class="card__actions"><button class="btn btn--sm" data-action="addGalleryPhoto">+ Add Photo</button></div></div>
+          <div class="gallery-grid" id="galleryEditor"></div>
+        </div>
+      </section>
+
+      <section class="view" data-view="about">
+        <div class="view-head"><h1>About Us</h1><p>The story section.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title">Main content</div></div>
+          <div class="field" style="margin-bottom:16px"><label>Heading</label><input type="text" data-bind="about.heading"></div>
+          <div class="field" style="margin-bottom:16px"><label>Lead paragraph</label><textarea data-bind="about.lead" rows="3"></textarea></div>
+          <div class="field"><label>Second paragraph</label><textarea data-bind="about.body" rows="3"></textarea></div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">About image</div></div>
+          <div class="img-field" data-img="about.image">
+            <div class="img-field__preview" data-img-preview>no image</div>
+            <div class="img-field__body"><input type="text" data-bind="about.image"><div class="img-field__row"><button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="about.image">📷 Upload</button><button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="about.image">Clear</button></div></div>
+          </div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Value points</div><div class="card__actions"><button class="btn btn--ghost btn--sm" data-action="addValue">+ Add</button></div></div><div id="valuesEditor"></div></div>
+        <div class="card"><div class="card__head"><div class="card__title">Owner's story</div></div>
+          <div class="field" style="margin-bottom:16px"><label>Story heading</label><input type="text" data-bind="about.storyTitle"></div>
+          <div class="field"><label>Story body</label><textarea data-bind="about.storyBody" rows="5"></textarea></div>
+        </div>
+      </section>
+
+      <section class="view" data-view="social">
+        <div class="view-head"><h1>Social Links</h1><p>Leave empty to show "to be added".</p></div>
+        <div class="card"><div id="socialEditor"></div></div>
+      </section>
+
+      <section class="view" data-view="reviews">
+        <div class="view-head"><h1>Customer Reviews</h1><p>Only add reviews you can verify.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title" id="reviewsTitle">No reviews yet</div><div class="card__actions"><button class="btn btn--sm" data-action="addReview">+ Add Review</button></div></div><div id="reviewsEditor"></div></div>
+      </section>
+
+      <section class="view" data-view="backup">
+        <div class="view-head"><h1>Backup &amp; Restore</h1><p>Export your content as JSON or restore from a backup.</p></div>
+        <div class="card"><div class="card__head"><div class="card__title">Export</div></div>
+          <div class="card__actions">
+            <button class="btn btn--sm" data-action="exportJson">Download backup (.json)</button>
+            <button class="btn btn--ghost btn--sm" data-action="copyJson">Copy JSON</button>
+          </div>
+        </div>
+        <div class="card"><div class="card__head"><div class="card__title">Import</div></div>
+          <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+          <button class="btn btn--sm" data-action="triggerImport">Choose backup file…</button>
+        </div>
+        <div class="card" style="border-color:rgba(255,122,122,.3)">
+          <div class="card__head"><div class="card__title" style="color:var(--danger)">Danger zone</div></div>
+          <p style="color:var(--muted);font-size:.86rem;margin:0 0 16px">Reset every field to its original default.</p>
+          <button class="btn btn--danger btn--sm" data-action="resetAll">Reset everything to default</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal"><div class="modal"><h3 id="modalTitle">Confirm</h3><p id="modalBody">Are you sure?</p><div class="modal__actions"><button class="btn btn--ghost" id="modalCancel">Cancel</button><button class="btn btn--danger" id="modalConfirm">Confirm</button></div></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+<input type="file" id="hiddenFileInput" accept="image/*" style="display:none">
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, limit }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUFSQDjD1vD5j8At06QXIFaSvQVkJhk8s",
+  authDomain: "jayds-kitchen.firebaseapp.com",
+  projectId: "jayds-kitchen",
+  storageBucket: "jayds-kitchen.firebasestorage.app",
+  messagingSenderId: "606950048964",
+  appId: "1:606950048964:web:e42a8744559cf55a91f591"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+console.log("🔥 Admin connected to Firebase");
+
+const DEFAULT_DATA = {
+  business:{
+    name:"JayDs Kitchen",nameAccent:"Kitchen",logo:"logo.jpeg",
+    phoneDisplay:"071 573 9783",phoneTel:"+27715739783",whatsapp:"27715739783",
+    address:{street:"Pwest Church Street and 575 Univen Road",city:"Thohoyandou",province:"Limpopo",postal:"0933",country:"South Africa"},
+    bank:{bankName:"",accountName:"",accountNumber:"",branchCode:"",accountType:"",referencePrefix:"JDK",instructions:"Use your order reference as the payment description."}
+  },
+  config:{cloudinary:{cloudName:"fstqzsn5",uploadPreset:"jayds_unsigned"}},
+  hero:{eyebrow:"Thohoyandou · Limpopo",headlineLine1:"Good Food. Great Taste.",headlineLine2:"Made for You.",
+    lead:"JayDs Kitchen is a local food business serving freshly prepared, generously portioned meals in Thohoyandou.",
+    coverImage:"cover.jpeg",sideImage:"cover.jpeg"},
+  hours:[{day:"Monday",open:"09:00",close:"—",confirmed:false},{day:"Tuesday",open:"09:00",close:"—",confirmed:false},{day:"Wednesday",open:"09:00",close:"—",confirmed:false},{day:"Thursday",open:"09:00",close:"—",confirmed:false},{day:"Friday",open:"09:00",close:"—",confirmed:false},{day:"Saturday",open:"09:00",close:"—",confirmed:false},{day:"Sunday",open:"09:00",close:"—",confirmed:false}],
+  menuNotice:"",
+  menu:[
+    {id:"c1",category:"KOTA",items:[]},
+    {id:"c2",category:"FOOD",items:[]},
+    {id:"c3",category:"BEVERAGES",items:[]}
+  ],
+  gallery:[{id:"g1",image:"cover.jpeg",caption:"Freshly plated"},{id:"g2",image:"about.jpeg",caption:"In the kitchen"},{id:"g3",image:"location.jpeg",caption:"Our home in Thohoyandou"}],
+  about:{heading:"Home cooking, made for the community",
+    lead:"JayDs Kitchen is a proudly local food business based in Thohoyandou, Limpopo.",
+    body:"Our focus is simple: fresh ingredients, generous portions and consistent taste.",
+    image:"about.jpeg",
+    values:[{title:"Freshly prepared.",text:"Cooked to order."},{title:"Community first.",text:"Friendly service and fair prices."},{title:"Easy to order.",text:"Order online, pay by EFT."}],
+    storyTitle:"Owner's story — to be added",storyBody:"This space is reserved for JayDs Kitchen's real story."},
+  social:[{label:"Facebook",url:"",icon:"facebook"},{label:"Instagram",url:"",icon:"instagram"},{label:"TikTok",url:"",icon:"tiktok"}],
+  testimonials:[],
+  contact:{
+    locationImage:"location.jpeg",
+    locationImage2:"location2.jpeg",
+    mapUrl:"https://maps.app.goo.gl/ZG2XiuCoCctHT9FF8?g_st=ic"
+  },
+  appearance:{accent:"#2ee6c5"},
+  security:{adminPassword:""}
+};
+
+const $ = (s,c=document)=>c.querySelector(s);
+const $$ = (s,c=document)=>[...c.querySelectorAll(s)];
+const uid = (p="id")=>p+"_"+Math.random().toString(36).slice(2,9);
+const deepClone = o=>JSON.parse(JSON.stringify(o));
+const esc = s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function mergeDeep(base,override){
+  if(Array.isArray(override)) return override;
+  if(override&&typeof override==="object"){
+    const out={...base};
+    for(const k of Object.keys(override)) out[k]=mergeDeep(base&&base[k],override[k]);
+    return out;
+  }
+  return override===undefined?base:override;
+}
+function getPath(o,p){return p.split(".").reduce((a,k)=>(a==null?undefined:a[k]),o);}
+function setPath(o,p,v){const ks=p.split(".");const last=ks.pop();const t=ks.reduce((a,k)=>(a[k]=a[k]||{}),o);t[last]=v;}
+
+let DATA=null, DRAFT=null, isDirty=false, activeView="dashboard", currentUser=null;
+let ordersCache=[], orderFilter="all";
+
+function toast(msg,type="ok",ms=3200){
+  const wrap=$("#toastWrap");
+  const icons={
+    ok:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    warn:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+    err:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>'
+  };
+  const el=document.createElement("div");
+  el.className="toast toast--"+type;
+  el.innerHTML=icons[type]+"<span>"+esc(msg)+"</span>";
+  wrap.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add("show"));
+  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),400);},ms);
+}
+
+let modalResolve=null;
+function confirmModal(t,b,l="Confirm"){return new Promise(r=>{$("#modalTitle").textContent=t;$("#modalBody").textContent=b;$("#modalConfirm").textContent=l;$("#modal").classList.add("open");modalResolve=r;});}
+$("#modalCancel").addEventListener("click",()=>{$("#modal").classList.remove("open");modalResolve?.(false);});
+$("#modalConfirm").addEventListener("click",()=>{$("#modal").classList.remove("open");modalResolve?.(true);});
+
+async function loadFromFirebase(){const s=await getDoc(doc(db,"siteContent","main"));return s.exists()?s.data():null;}
+async function saveToFirebase(d){await setDoc(doc(db,"siteContent","main"),d);}
+
+/* ============================================================
+   CLOUDINARY UPLOAD
+   ============================================================ */
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_TYPES = ["image/jpeg","image/png","image/webp","image/gif","image/avif"];
+
+function validateImage(file){
+  if(!file) return "No file selected.";
+  if(file.size > MAX_FILE_SIZE)
+    return `File is too large (${(file.size/1024/1024).toFixed(1)} MB). Max is 5 MB.`;
+  if(!ALLOWED_TYPES.includes(file.type)){
+    const ext="."+(file.name.split(".").pop()||"").toLowerCase();
+    if(![".jpg",".jpeg",".png",".webp",".gif",".avif"].includes(ext))
+      return "File type not supported. Use JPG, PNG, WebP, GIF or AVIF.";
+  }
+  return null;
+}
+
+function uploadToCloudinary(file,onProgress){
+  const cfg=DRAFT.config?.cloudinary||{};
+  const cloudName=cfg.cloudName;
+  const preset=cfg.uploadPreset;
+  if(!cloudName||!preset)
+    return Promise.reject(new Error("Cloudinary not configured. Enter cloud name and upload preset in Business Info."));
+
+  const url=`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const formData=new FormData();
+  formData.append("file",file);
+  formData.append("upload_preset",preset);
+  formData.append("folder","jayds-kitchen");
+
+  return new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open("POST",url);
+    xhr.upload.addEventListener("progress",(e)=>{
+      if(e.lengthComputable && typeof onProgress==="function")
+        onProgress(Math.round((e.loaded/e.total)*100));
+    });
+    xhr.addEventListener("load",()=>{
+      if(xhr.status>=200 && xhr.status<300){
+        try{
+          const d=JSON.parse(xhr.responseText);
+          resolve({url:d.secure_url,publicId:d.public_id,filename:d.original_filename,format:d.format,size:d.bytes,width:d.width,height:d.height});
+        }catch{reject(new Error("Invalid response from Cloudinary."));}
+      } else {
+        let msg=`Upload failed (HTTP ${xhr.status}).`;
+        try{
+          const err=JSON.parse(xhr.responseText);
+          if(err?.error?.message) msg=err.error.message;
+          if(xhr.status===400 && /preset/i.test(msg))
+            msg="Upload preset not found or not unsigned. Check Settings → Upload in Cloudinary.";
+          if(xhr.status===401||xhr.status===403)
+            msg="Cloudinary rejected the preset. Make sure it's set to 'Unsigned'.";
+        }catch{}
+        reject(new Error(msg));
+      }
+    });
+    xhr.addEventListener("error",()=>reject(new Error("Network error. Check your internet and try again.")));
+    xhr.addEventListener("abort",()=>reject(new Error("Upload cancelled.")));
+    xhr.send(formData);
+  });
+}
+
+const hiddenFileInput=$("#hiddenFileInput");
+let pendingImageTarget=null;
+
+hiddenFileInput.addEventListener("change",async()=>{
+  const file=hiddenFileInput.files[0];
+  hiddenFileInput.value="";
+  if(!file||!pendingImageTarget) return;
+
+  const err=validateImage(file);
+  if(err){ toast(err,"err",6000); return; }
+
+  const wrapper=document.querySelector(`[data-img="${pendingImageTarget}"]`);
+  const preview=wrapper?.querySelector("[data-img-preview]");
+  const originalHTML=preview?.innerHTML||"";
+
+  if(preview){
+    preview.innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;height:100%;padding:6px">
+        <div style="font-size:.58rem;color:var(--accent);font-weight:800;letter-spacing:.08em">UPLOADING</div>
+        <div style="width:100%;height:5px;background:var(--bg);border-radius:99px;overflow:hidden">
+          <div id="uploadBar" style="height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .2s"></div>
+        </div>
+        <div id="uploadPct" style="font-size:.62rem;color:var(--muted);font-weight:700">0%</div>
+      </div>`;
+  }
+
+  const target=pendingImageTarget;
+  pendingImageTarget=null;
+
+  try{
+    const result=await uploadToCloudinary(file,(pct)=>{
+      const bar=document.getElementById("uploadBar");
+      const pctEl=document.getElementById("uploadPct");
+      if(bar) bar.style.width=pct+"%";
+      if(pctEl) pctEl.textContent=pct+"%";
+    });
+
+    setPath(DRAFT,target,result.url);
+    const ti=document.querySelector(`[data-bind="${target}"]`);
+    if(ti) ti.value=result.url;
+
+    refreshImagePreview(target);
+    if(target==="business.logo") renderSidebarBrand();
+    markDirty();
+    toast(`✅ Uploaded — click Save Changes to publish`,"ok",5000);
+    console.log("✅ Cloudinary upload:",result);
+  }catch(e){
+    console.error("Upload failed:",e);
+    if(preview) preview.innerHTML=originalHTML;
+    toast("❌ "+e.message,"err",8000);
+  }
+});
+
+function refreshImagePreview(path){
+  const w=document.querySelector(`[data-img="${path}"]`);
+  if(!w) return;
+  const p=w.querySelector("[data-img-preview]");
+  const v=getPath(DRAFT,path);
+  if(v){
+    p.innerHTML=`<img src="${esc(v)}" alt="" loading="lazy"
+      onerror="this.parentElement.innerHTML='<div style=&quot;font-size:.6rem;color:var(--danger);text-align:center;line-height:1.2;padding:4px&quot;>⚠ Image not loading</div>'">`;
+  } else {
+    p.textContent="no image";
+  }
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+const loginScreen=$("#loginScreen"), app=$("#app");
+function showLogin(){loginScreen.style.display="flex";app.classList.add("hidden");}
+function showApp(){loginScreen.style.display="none";app.classList.remove("hidden");}
+
+$("#loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=$("#email").value.trim(), pw=$("#pw").value;
+  const btn=$("#loginSubmit"); btn.disabled=true; btn.textContent="Signing in…";
+  try{
+    await signInWithEmailAndPassword(auth,email,pw);
+    $("#loginErr").classList.remove("show");
+    $("#pw").value="";
+  }catch(err){
+    const msg=(err.code==="auth/wrong-password"||err.code==="auth/invalid-credential")?"Incorrect email or password.":err.message;
+    const el=$("#loginErr"); el.textContent=msg; el.classList.add("show");
+  }finally{ btn.disabled=false; btn.textContent="Sign In"; }
+});
+$("#logoutBtn").addEventListener("click",async()=>{await signOut(auth);});
+
+onAuthStateChanged(auth,async user=>{
+  currentUser=user;
+  if(user){ showApp(); await bootData(); }
+  else showLogin();
+});
+
+async function bootData(){
+  try{
+    const fb=await loadFromFirebase();
+    if(fb){DATA=mergeDeep(deepClone(DEFAULT_DATA),fb);console.log("✅ Loaded from Firestore");}
+    else{DATA=deepClone(DEFAULT_DATA);await saveToFirebase(DATA);console.log("ℹ️ Seeded defaults");}
+  }catch(e){console.error(e);DATA=deepClone(DEFAULT_DATA);toast("Using defaults — Firebase load failed","warn");}
+  DRAFT=deepClone(DATA);
+  applyAppearance();
+  renderSidebarBrand();
+  renderAll();
+  markSaved();
+  loadOrdersBadge();
+}
+
+$("#saveBtn").addEventListener("click",async()=>{
+  const btn=$("#saveBtn");
+  btn.disabled=true; btn.textContent="Saving…";
+  try{
+    DATA=deepClone(DRAFT);
+    await saveToFirebase(DATA);
+    applyAppearance();
+    renderAll();
+    markSaved();
+    toast("Saved to Firebase — live for all visitors","ok");
+  }catch(e){console.error(e);toast("Save failed: "+e.message,"err",5000);}
+  finally{ btn.disabled=false; btn.textContent="Save Changes"; }
+});
+
+function markDirty(){isDirty=true;const el=$("#saveState");el.textContent="Unsaved changes";el.classList.add("dirty");}
+function markSaved(){isDirty=false;const el=$("#saveState");el.textContent="Saved";el.classList.remove("dirty");}
+window.addEventListener("beforeunload",e=>{if(isDirty){e.preventDefault();e.returnValue="";}});
+
+function renderSidebarBrand(){
+  const m=$("#sidebarMark"); if(m){const img=m.querySelector("img");if(DRAFT.business.logo){img.src=DRAFT.business.logo;img.style.display="";}else img.style.display="none";}
+  const lm=$("#loginLogo"); if(lm){const i2=lm.querySelector("img");if(DRAFT.business.logo){i2.src=DRAFT.business.logo;i2.style.display="";}else i2.style.display="none";}
+}
+function applyAppearance(){
+  const a=(DRAFT&&DRAFT.appearance&&DRAFT.appearance.accent)||"#2ee6c5";
+  document.documentElement.style.setProperty("--accent",a);
+  document.documentElement.style.setProperty("--accent-soft",hexA(a,.11));
+  document.documentElement.style.setProperty("--accent-line",hexA(a,.35));
+}
+function hexA(hex,al){const m=hex.replace("#","");return `rgba(${parseInt(m.substr(0,2),16)},${parseInt(m.substr(2,2),16)},${parseInt(m.substr(4,2),16)},${al})`;}
+
+const VIEW_META={
+  dashboard:{t:"Dashboard",s:"Overview of your site"},
+  orders:{t:"Orders",s:"Orders placed through the website"},
+  business:{t:"Business Info",s:"Name, contact, address and location"},
+  bank:{t:"Bank Details",s:"EFT information for customers"},
+  hero:{t:"Hero Section",s:"First thing customers see"},
+  menu:{t:"Menu",s:"KOTA · FOOD · BEVERAGES"},
+  hours:{t:"Opening Hours",s:"When you're open"},
+  gallery:{t:"Gallery",s:"Photos of your food"},
+  about:{t:"About Us",s:"Your story and philosophy"},
+  social:{t:"Social Links",s:"Facebook, Instagram and more"},
+  reviews:{t:"Reviews",s:"Customer testimonials"},
+  backup:{t:"Backup & Restore",s:"Export and import"}
+};
+function switchView(v){
+  activeView=v;
+  $$(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  $$(".view").forEach(s=>s.classList.toggle("active",s.dataset.view===v));
+  const m=VIEW_META[v]||{t:v,s:""};
+  $("#viewTitle").innerHTML=`${esc(m.t)}<small>${esc(m.s)}</small>`;
+  $("#content").scrollTop=0;
+  closeSidebarMobile();
+  renderView(v);
+}
+$$(".nav-item").forEach(b=>b.addEventListener("click",()=>switchView(b.dataset.view)));
+$$("[data-goto]").forEach(el=>el.addEventListener("click",()=>switchView(el.dataset.goto)));
+
+const sidebar=$("#sidebar"), sidebarBackdrop=$("#sidebarBackdrop");
+function openSidebarMobile(){sidebar.classList.add("open");sidebarBackdrop.classList.add("open");}
+function closeSidebarMobile(){sidebar.classList.remove("open");sidebarBackdrop.classList.remove("open");}
+$("#menuBtn").addEventListener("click",openSidebarMobile);
+sidebarBackdrop.addEventListener("click",closeSidebarMobile);
+
+function renderAll(){
+  renderSidebarBrand();
+  renderView(activeView);
+  updateBadges();
+  applyAppearance();
+}
+function updateBadges(){
+  const dishes=DRAFT.menu.reduce((s,g)=>s+g.items.length,0);
+  $("#menuBadge").textContent=dishes;
+  $("#galleryBadge").textContent=DRAFT.gallery.filter(g=>g.image).length;
+}
+async function loadOrdersBadge(){
+  try{
+    const q=query(collection(db,"orders"),orderBy("createdAt","desc"),limit(50));
+    const snap=await getDocs(q);
+    ordersCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const newCount=ordersCache.filter(o=>o.status==="new"||o.paymentStatus==="awaiting").length;
+    const badge=$("#ordersBadge");
+    badge.textContent=newCount;
+    badge.classList.toggle("nav-item__badge--warn",newCount>0);
+  }catch(e){console.warn("Could not load orders badge:",e);}
+}
+function renderView(v){
+  switch(v){
+    case "dashboard": renderDashboard(); break;
+    case "orders": renderOrders(); break;
+    case "business":
+      refreshImagePreview("business.logo");
+      refreshImagePreview("contact.locationImage");
+      refreshImagePreview("contact.locationImage2");
+      break;
+    case "bank": renderBankPreview(); break;
+    case "hero": refreshImagePreview("hero.coverImage"); refreshImagePreview("hero.sideImage"); break;
+    case "menu": renderMenu(); break;
+    case "hours": renderHours(); break;
+    case "gallery": renderGallery(); break;
+    case "about": refreshImagePreview("about.image"); renderAbout(); break;
+    case "social": renderSocial(); break;
+    case "reviews": renderReviews(); break;
+  }
+  bindInputs(document.querySelector(`.view[data-view="${v}"]`)||document);
+}
+
+function renderDashboard(){
+  const total=DRAFT.menu.reduce((s,g)=>s+g.items.length,0);
+  const zero=DRAFT.menu.reduce((s,g)=>s+g.items.filter(i=>!Number(i.price)).length,0);
+  const newOrders=ordersCache.filter(o=>o.status==="new").length;
+  const awaiting=ordersCache.filter(o=>o.paymentStatus==="awaiting").length;
+  const gal=DRAFT.gallery.filter(g=>g.image).length;
+  $("#statDishes").textContent=total;
+  $("#statDishesMeta").textContent=DRAFT.menu.length+" categories";
+  $("#statNewOrders").textContent=newOrders;
+  $("#statAwaiting").textContent=awaiting;
+  $("#statGallery").textContent=gal;
+
+  const cl=[];
+  if(!DRAFT.config?.cloudinary?.cloudName) cl.push("Cloudinary cloud name not set — image uploads will not work");
+  if(!DRAFT.config?.cloudinary?.uploadPreset) cl.push("Cloudinary upload preset not set");
+  if(!DRAFT.business.bank.bankName||!DRAFT.business.bank.accountNumber) cl.push("Bank details are not set up — customers won't be able to pay by EFT");
+  if(zero>0) cl.push(`${zero} dish${zero>1?"es":""} still have a placeholder price of R 0.00`);
+  DRAFT.menu.forEach(g=>{
+    if(g.items.length===0) cl.push(`"${g.category}" category is empty — add some items`);
+  });
+  if(DRAFT.hours.filter(h=>!h.confirmed).length>0) cl.push(`${DRAFT.hours.filter(h=>!h.confirmed).length} day(s) of opening hours need confirmation`);
+  if(!DRAFT.business.logo) cl.push("No logo uploaded yet");
+  if(DRAFT.gallery.filter(g=>g.image).length<4) cl.push("Add more gallery photos (at least 4 recommended)");
+  if(DRAFT.social.every(s=>!s.url)) cl.push("No social media links added yet");
+
+  const box=$("#launchChecklist");
+  if(!cl.length) box.innerHTML=`<div class="empty-state" style="border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.04)"><p style="color:var(--ok);font-weight:700;margin:0">All clear — nothing outstanding</p></div>`;
+  else box.innerHTML=cl.map(t=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)"><span style="flex:none;margin-top:1px;color:var(--warn)">⚠</span><span style="font-size:.88rem;color:var(--muted)">${esc(t)}</span></div>`).join("");
+}
+
+function renderBankPreview(){
+  const b=DRAFT.business.bank||{};
+  const el=$("#bankPreview");
+  if(!el) return;
+  if(!b.bankName){
+    el.innerHTML=`<div style="font-size:.82rem;color:var(--muted-2);text-align:center;padding:14px">Enter your bank details above to see the preview</div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div style="display:grid;gap:8px;font-size:.85rem">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--muted)">Bank</span><strong>${esc(b.bankName)}</strong></div>
+      ${b.accountName?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--muted)">Account holder</span><strong>${esc(b.accountName)}</strong></div>`:""}
+      ${b.accountNumber?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--muted)">Account number</span><strong>${esc(b.accountNumber)}</strong></div>`:""}
+      ${b.branchCode?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--muted)">Branch code</span><strong>${esc(b.branchCode)}</strong></div>`:""}
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:var(--muted)">Reference example</span><strong style="color:var(--accent)">${esc(b.referencePrefix||"JDK")}-20250115-4821</strong></div>
+    </div>`;
+}
+
+async function loadOrders(){
+  const box=$("#ordersList");
+  $("#ordersCount").textContent="Loading…";
+  try{
+    const q=query(collection(db,"orders"),orderBy("createdAt","desc"),limit(100));
+    const snap=await getDocs(q);
+    ordersCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderOrders();
+    const newCount=ordersCache.filter(o=>o.status==="new"||o.paymentStatus==="awaiting").length;
+    const badge=$("#ordersBadge"); badge.textContent=newCount;
+    badge.classList.toggle("nav-item__badge--warn",newCount>0);
+  }catch(e){
+    console.error(e);
+    $("#ordersCount").textContent="Error";
+    box.innerHTML=`<div class="empty-state"><p>Could not load orders: ${esc(e.message)}</p></div>`;
+  }
+}
+function renderOrders(){
+  const box=$("#ordersList");
+  let list=ordersCache;
+  if(orderFilter!=="all") list=list.filter(o=>o.status===orderFilter||o.paymentStatus===orderFilter);
+  $("#ordersCount").textContent=`${list.length} order${list.length!==1?"s":""}`;
+  if(!list.length){box.innerHTML=`<div class="empty-state"><p>No orders to show.</p></div>`;return;}
+  box.innerHTML=list.map(o=>{
+    const date=o.createdAt?.toDate?.().toLocaleString?.()||"—";
+    const status=o.status||"new";
+    const payStatus=o.paymentStatus||"awaiting";
+    const pillClass = payStatus==="paid" ? "paid" : (status==="ready" ? "ready" : (status==="collected" ? "collected" : (status==="cancelled"?"cancelled":(payStatus==="awaiting"?"awaiting":"new"))));
+    const payBadge = payStatus==="paid"
+      ? `<span class="status-pill status-pill--paid">✓ Paid</span>`
+      : `<span class="status-pill status-pill--awaiting">Awaiting payment</span>`;
+    const statusBadge = `<span class="status-pill status-pill--${pillClass}">${esc(status)}</span>`;
+    return `<div class="order-card">
+      <div class="order-card__head">
+        <div>
+          <div class="order-card__ref">${esc(o.reference||o.id.slice(0,8))}</div>
+          <div class="order-card__meta">${esc(date)} · ${esc(o.orderType||"")}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="order-card__amount">R ${Number(o.subtotal||0).toFixed(2)}</div>
+          <div style="margin-top:4px">${payBadge} ${statusBadge}</div>
+        </div>
+      </div>
+      <div class="order-card__body">
+        <div><strong style="color:var(--text)">${esc(o.name||"Unknown")}</strong> · <a href="tel:${esc(o.phone||"")}" style="color:var(--accent)">${esc(o.phone||"")}</a>${o.email?` · ${esc(o.email)}`:""}</div>
+        ${o.address?`<div>📍 ${esc(o.address)}${o.landmark?` (${esc(o.landmark)})`:""}</div>`:""}
+        ${o.preferredTime?`<div>🕐 Preferred: ${esc(o.preferredTime)}</div>`:""}
+        ${o.notes?`<div>📝 ${esc(o.notes)}</div>`:""}
+        <div class="order-card__items">
+          ${(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between"><span>${i.qty}× ${esc(i.name)}</span><span style="color:var(--text)">R ${(Number(i.price||0)*i.qty).toFixed(2)}</span></div>`).join("")}
+        </div>
+      </div>
+      <div class="order-card__actions">
+        <a class="btn btn--wa btn--xs" href="https://wa.me/${esc((o.phone||"").replace(/[^0-9]/g,"").replace(/^0/,"27"))}" target="_blank" rel="noopener">WhatsApp</a>
+        ${payStatus!=="paid"?`<button class="btn btn--xs" data-action="markPaid" data-id="${esc(o.id)}">Mark as paid</button>`:""}
+        ${status==="new"||status==="paid" ? `<button class="btn btn--ghost btn--xs" data-action="markReady" data-id="${esc(o.id)}">Ready for collection</button>`:""}
+        ${status==="ready" ? `<button class="btn btn--ghost btn--xs" data-action="markCollected" data-id="${esc(o.id)}">Mark as collected</button>`:""}
+        <button class="btn btn--danger btn--xs" data-action="cancelOrder" data-id="${esc(o.id)}" style="margin-left:auto">Cancel</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+$$(".order-filter").forEach(b=>b.addEventListener("click",()=>{
+  $$(".order-filter").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  orderFilter=b.dataset.filter;
+  renderOrders();
+}));
+
+/* ============================================================
+   MENU EDITOR — 3 fixed categories (KOTA / FOOD / BEVERAGES)
+   ============================================================ */
+function renderMenu(){
+  const box=$("#menuEditor");
+  if(!DRAFT.menu.length){box.innerHTML=`<div class="empty-state"><p>No categories found.</p></div>`;return;}
+  box.innerHTML=DRAFT.menu.map((g,gi)=>`
+    <div class="cat-card">
+      <div class="cat-head">
+        <input class="cat-head__name" type="text" data-bind="menu.${gi}.category" value="${esc(g.category)}">
+        <span class="cat-head__count">${g.items.length} item${g.items.length!==1?"s":""}</span>
+      </div>
+      <div class="cat-body">
+        ${g.items.length===0?`<div class="empty-state" style="padding:20px;margin-bottom:12px"><p style="margin:0;font-size:.84rem">No items in <strong>${esc(g.category)}</strong> yet — click below to add one.</p></div>`:""}
+        ${g.items.map((it,ii)=>`
+          <div class="dish-row">
+            <div class="dish-row__head">
+              <span class="dish-row__num">${ii+1}</span>
+              <span class="dish-row__name">${esc(it.name||"Untitled")}</span>
+              <div class="dish-row__actions">
+                <button class="icon-btn" data-action="moveDishUp" data-gi="${gi}" data-ii="${ii}" ${ii===0?"disabled":""}>↑</button>
+                <button class="icon-btn" data-action="moveDishDown" data-gi="${gi}" data-ii="${ii}" ${ii===g.items.length-1?"disabled":""}>↓</button>
+                <button class="icon-btn icon-btn--danger" data-action="deleteDish" data-gi="${gi}" data-ii="${ii}">🗑</button>
+              </div>
+            </div>
+            <div class="grid grid--2" style="margin-bottom:12px">
+              <div class="field"><label>Name</label><input type="text" data-bind="menu.${gi}.items.${ii}.name" value="${esc(it.name)}"></div>
+              <div class="field"><label>Price (R) <span class="tip">0 = TBC</span></label><input type="number" min="0" step="0.01" data-bind="menu.${gi}.items.${ii}.price" value="${Number(it.price)||0}"></div>
+            </div>
+            <div class="grid grid--2" style="margin-bottom:12px">
+              <div class="field"><label>Tag <span class="tip">optional</span></label><input type="text" data-bind="menu.${gi}.items.${ii}.tag" value="${esc(it.tag||"")}" placeholder="Popular, New, Spicy"></div>
+              <div class="field"><label>Description</label><input type="text" data-bind="menu.${gi}.items.${ii}.desc" value="${esc(it.desc)}"></div>
+            </div>
+            <div class="img-field" data-img="menu.${gi}.items.${ii}.image">
+              <div class="img-field__preview" data-img-preview>${it.image?`<img src="${esc(it.image)}" alt="" onerror="this.parentElement.textContent='broken'">`:"no image"}</div>
+              <div class="img-field__body">
+                <input type="text" data-bind="menu.${gi}.items.${ii}.image" value="${esc(it.image||"")}" placeholder="Upload or paste URL">
+                <div class="img-field__row">
+                  <button type="button" class="btn btn--ghost btn--xs" data-action="pickFile" data-target="menu.${gi}.items.${ii}.image">📷 Upload photo</button>
+                  <button type="button" class="btn btn--ghost btn--xs" data-action="clearImg" data-target="menu.${gi}.items.${ii}.image">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>`).join("")}
+        <button class="btn btn--ghost btn--sm" data-action="addDish" data-gi="${gi}" style="margin-top:6px">+ Add item to ${esc(g.category)}</button>
+      </div>
+    </div>`).join("");
+}
+
+function renderHours(){
+  $("#hoursEditor").innerHTML=DRAFT.hours.map((h,i)=>`
+    <div class="hours-row">
+      <input type="text" data-bind="hours.${i}.day" value="${esc(h.day)}">
+      <input type="text" data-bind="hours.${i}.open" value="${esc(h.open)}" placeholder="09:00">
+      <input type="text" data-bind="hours.${i}.close" value="${esc(h.close)}" placeholder="18:00">
+      <label class="check ${h.confirmed?"on":""}"><input type="checkbox" data-bind="hours.${i}.confirmed" ${h.confirmed?"checked":""}><span>Confirmed</span></label>
+    </div>`).join("");
+}
+
+function renderGallery(){
+  const real=DRAFT.gallery.filter(g=>g.image).length;
+  $("#galleryCount").textContent=real+" photo"+(real!==1?"s":"");
+  const box=$("#galleryEditor");
+  if(!DRAFT.gallery.length){box.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><p>No photos yet.</p></div>`;return;}
+  box.innerHTML=DRAFT.gallery.map((g,i)=>`
+    <div class="gallery-tile">
+      <div class="gallery-tile__img">${g.image?`<img src="${esc(g.image)}" alt="" onerror="this.parentElement.textContent='broken'">`:"No image"}</div>
+      <div class="gallery-tile__body">
+        <input type="text" data-bind="gallery.${i}.image" value="${esc(g.image)}" placeholder="Upload or paste URL">
+        <input type="text" data-bind="gallery.${i}.caption" value="${esc(g.caption||"")}" placeholder="Caption">
+        <div class="gallery-tile__actions">
+          <button class="icon-btn" data-action="pickFile" data-target="gallery.${i}.image">📷</button>
+          <button class="icon-btn" data-action="moveGalleryUp" data-i="${i}" ${i===0?"disabled":""}>↑</button>
+          <button class="icon-btn" data-action="moveGalleryDown" data-i="${i}" ${i===DRAFT.gallery.length-1?"disabled":""}>↓</button>
+          <button class="icon-btn icon-btn--danger" data-action="deleteGallery" data-i="${i}">🗑</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function renderAbout(){
+  const box=$("#valuesEditor");
+  if(!DRAFT.about.values.length){box.innerHTML=`<div class="empty-state" style="padding:24px"><p style="margin:0">No value points yet.</p></div>`;return;}
+  box.innerHTML=DRAFT.about.values.map((v,i)=>`
+    <div class="list-row">
+      <div class="list-row__head"><span class="list-row__label">Point ${i+1}</span><div class="list-row__actions">
+        <button class="icon-btn" data-action="moveValueUp" data-i="${i}" ${i===0?"disabled":""}>↑</button>
+        <button class="icon-btn" data-action="moveValueDown" data-i="${i}" ${i===DRAFT.about.values.length-1?"disabled":""}>↓</button>
+        <button class="icon-btn icon-btn--danger" data-action="deleteValue" data-i="${i}">🗑</button>
+      </div></div>
+      <div class="grid grid--2">
+        <div class="field"><label>Bold lead</label><input type="text" data-bind="about.values.${i}.title" value="${esc(v.title)}"></div>
+        <div class="field"><label>Text</label><input type="text" data-bind="about.values.${i}.text" value="${esc(v.text)}"></div>
+      </div>
+    </div>`).join("");
+}
+
+function renderSocial(){
+  $("#socialEditor").innerHTML=DRAFT.social.map((s,i)=>`
+    <div class="list-row">
+      <div class="list-row__head"><span class="list-row__label">${esc(s.label)}</span>
+        <span class="status-pill ${s.url?"status-pill--paid":"status-pill--awaiting"}">${s.url?"Linked":"No URL"}</span>
+      </div>
+      <div class="grid grid--3">
+        <div class="field"><label>Network</label><select data-bind="social.${i}.label">${["Facebook","Instagram","TikTok","X (Twitter)","YouTube","WhatsApp"].map(n=>`<option ${s.label===n?"selected":""}>${n}</option>`).join("")}</select></div>
+        <div class="field"><label>Icon</label><select data-bind="social.${i}.icon">${["facebook","instagram","tiktok"].map(n=>`<option value="${n}" ${s.icon===n?"selected":""}>${n}</option>`).join("")}</select></div>
+        <div class="field"><label>URL</label><input type="text" data-bind="social.${i}.url" value="${esc(s.url)}" placeholder="https://..."></div>
+      </div>
+    </div>`).join("");
+}
+
+function renderReviews(){
+  const box=$("#reviewsEditor");
+  $("#reviewsTitle").textContent=DRAFT.testimonials.length===0?"No reviews yet":DRAFT.testimonials.length+" review"+(DRAFT.testimonials.length>1?"s":"");
+  if(!DRAFT.testimonials.length){
+    box.innerHTML=`<div class="empty-state"><p>No reviews yet — the section stays hidden on the public site.</p></div>`;
+    return;
+  }
+  box.innerHTML=DRAFT.testimonials.map((t,i)=>`
+    <div class="list-row">
+      <div class="list-row__head"><span class="list-row__label">Review ${i+1}</span><div class="list-row__actions"><button class="icon-btn icon-btn--danger" data-action="deleteReview" data-i="${i}">🗑</button></div></div>
+      <div class="grid grid--3">
+        <div class="field"><label>Name</label><input type="text" data-bind="testimonials.${i}.name" value="${esc(t.name)}"></div>
+        <div class="field"><label>Rating</label><input type="number" min="1" max="5" data-bind="testimonials.${i}.rating" value="${Number(t.rating)||5}"></div>
+        <div class="field"><label>Source</label><input type="text" data-bind="testimonials.${i}.source" value="${esc(t.source||"")}"></div>
+      </div>
+      <div class="field"><label>Review text</label><textarea data-bind="testimonials.${i}.text" rows="3">${esc(t.text)}</textarea></div>
+    </div>`).join("");
+}
+
+function bindInputs(root){
+  $$("[data-bind]",root).forEach(input=>{
+    const path=input.dataset.bind;
+    const val=getPath(DRAFT,path);
+    if(input.type==="checkbox"){input.checked=!!val;input.closest(".check")?.classList.toggle("on",!!val);}
+    else if(document.activeElement!==input){
+      if(input.tagName==="SELECT") input.value=val??"";
+      else if(input.value!==String(val??"")) input.value=val??"";
+    }
+    const handler=()=>{
+      let nv;
+      if(input.type==="checkbox") nv=input.checked;
+      else if(input.type==="number") nv=Number(input.value)||0;
+      else nv=input.value;
+      setPath(DRAFT,path,nv);
+      markDirty();
+      if(path.endsWith(".image")||path.endsWith(".logo")||path.includes("Image")||path.includes("cover")) refreshImagePreview(path);
+      if(path==="business.logo") renderSidebarBrand();
+      if(path.startsWith("appearance.")) applyAppearance();
+      if(path.startsWith("business.bank.")) renderBankPreview();
+      if(path.startsWith("menu.")||path.startsWith("gallery.")||path.startsWith("testimonials.")) updateBadges();
+    };
+    input.addEventListener("input",handler);
+    input.addEventListener("change",handler);
+  });
+}
+
+document.addEventListener("click",async e=>{
+  const btn=e.target.closest("[data-action]"); if(!btn)return;
+  const a=btn.dataset.action;
+  const gi=btn.dataset.gi!==undefined?Number(btn.dataset.gi):null;
+  const ii=btn.dataset.ii!==undefined?Number(btn.dataset.ii):null;
+  const i=btn.dataset.i!==undefined?Number(btn.dataset.i):null;
+  const id=btn.dataset.id||null;
+
+  switch(a){
+    case "pickFile": pendingImageTarget=btn.dataset.target; hiddenFileInput.click(); break;
+    case "clearImg": {
+      const t=btn.dataset.target; setPath(DRAFT,t,"");
+      const ti=document.querySelector(`[data-bind="${t}"]`); if(ti) ti.value="";
+      refreshImagePreview(t); if(t==="business.logo") renderSidebarBrand();
+      markDirty(); toast("Image cleared","ok"); break;
+    }
+    case "testCloudinary": {
+      const result=$("#cloudinaryTestResult");
+      result.innerHTML='<span style="color:var(--warn)">⏳ Creating test image…</span>';
+      try{
+        const canvas=document.createElement("canvas");
+        canvas.width=200; canvas.height=200;
+        const ctx=canvas.getContext("2d");
+        ctx.fillStyle="#2ee6c5"; ctx.fillRect(0,0,200,200);
+        ctx.fillStyle="#04120f"; ctx.font="bold 26px sans-serif"; ctx.textAlign="center";
+        ctx.fillText("JayDs",100,110);
+        const blob=await new Promise(r=>canvas.toBlob(r,"image/png"));
+        const testFile=new File([blob],"jayds-test.png",{type:"image/png"});
+        result.innerHTML='<span style="color:var(--warn)">⏳ Uploading to Cloudinary…</span>';
+        const res=await uploadToCloudinary(testFile,()=>{});
+        result.innerHTML=`
+          <div style="color:var(--ok);font-weight:700;margin-bottom:10px">✅ Cloudinary is working!</div>
+          <img src="${esc(res.url)}" alt="test" style="width:100px;height:100px;border-radius:10px;border:1px solid var(--line);margin-bottom:10px">
+          <div style="font-size:.76rem;color:var(--muted);line-height:1.7">
+            <div><strong>URL:</strong> <a href="${esc(res.url)}" target="_blank" rel="noopener" style="color:var(--accent);word-break:break-all">${esc(res.url.slice(0,70))}…</a></div>
+            <div><strong>Dimensions:</strong> ${res.width}×${res.height}</div>
+            <div><strong>Size:</strong> ${(res.size/1024).toFixed(1)} KB</div>
+          </div>
+          <div style="margin-top:10px;font-size:.76rem;color:var(--muted-2)">You can now upload menu photos, logo and gallery images.</div>`;
+        toast("Cloudinary test passed ✅","ok");
+      }catch(e){
+        result.innerHTML=`
+          <div style="color:var(--danger);font-weight:700;margin-bottom:8px">❌ Upload failed</div>
+          <div style="font-size:.82rem;color:var(--muted);line-height:1.6">${esc(e.message)}</div>
+          <div style="margin-top:10px;font-size:.76rem;color:var(--muted-2);line-height:1.6">
+            <strong>Check:</strong><br>
+            1. Cloud name matches your Cloudinary dashboard exactly<br>
+            2. Upload preset is set to "Unsigned" in Cloudinary<br>
+            3. You clicked "Save Changes" after entering the config
+          </div>`;
+        toast("Cloudinary test failed","err",8000);
+      }
+      break;
+    }
+    case "addDish":
+      DRAFT.menu[gi].items.push({id:uid("m"),name:"",desc:"",price:0,tag:"",image:""});
+      markDirty(); renderMenu(); updateBadges(); break;
+    case "deleteDish":
+      if(!(await confirmModal("Delete this item?",`"${DRAFT.menu[gi].items[ii].name||"Untitled"}" will be removed.`,"Delete")))break;
+      DRAFT.menu[gi].items.splice(ii,1); markDirty(); renderMenu(); updateBadges(); break;
+    case "moveDishUp": if(ii>0){const ar=DRAFT.menu[gi].items;[ar[ii-1],ar[ii]]=[ar[ii],ar[ii-1]];markDirty();renderMenu();} break;
+    case "moveDishDown": {const ar=DRAFT.menu[gi].items;if(ii<ar.length-1){[ar[ii+1],ar[ii]]=[ar[ii],ar[ii+1]];markDirty();renderMenu();}} break;
+    case "addGalleryPhoto": DRAFT.gallery.push({id:uid("g"),image:"",caption:""}); markDirty(); renderGallery(); updateBadges(); break;
+    case "deleteGallery": DRAFT.gallery.splice(i,1); markDirty(); renderGallery(); updateBadges(); break;
+    case "moveGalleryUp": if(i>0){[DRAFT.gallery[i-1],DRAFT.gallery[i]]=[DRAFT.gallery[i],DRAFT.gallery[i-1]];markDirty();renderGallery();} break;
+    case "moveGalleryDown": if(i<DRAFT.gallery.length-1){[DRAFT.gallery[i+1],DRAFT.gallery[i]]=[DRAFT.gallery[i],DRAFT.gallery[i+1]];markDirty();renderGallery();} break;
+    case "addValue": DRAFT.about.values.push({title:"New point.",text:""}); markDirty(); renderAbout(); break;
+    case "deleteValue": DRAFT.about.values.splice(i,1); markDirty(); renderAbout(); break;
+    case "moveValueUp": if(i>0){[DRAFT.about.values[i-1],DRAFT.about.values[i]]=[DRAFT.about.values[i],DRAFT.about.values[i-1]];markDirty();renderAbout();} break;
+    case "moveValueDown": {const ar=DRAFT.about.values;if(i<ar.length-1){[ar[i+1],ar[i]]=[ar[i],ar[i+1]];markDirty();renderAbout();}} break;
+    case "addReview": DRAFT.testimonials.push({id:uid("t"),name:"",rating:5,text:"",source:""}); markDirty(); renderReviews(); break;
+    case "deleteReview": DRAFT.testimonials.splice(i,1); markDirty(); renderReviews(); break;
+    case "refreshOrders": await loadOrders(); break;
+    case "markPaid": {
+      if(!id) break;
+      try{
+        await updateDoc(doc(db,"orders",id),{paymentStatus:"paid",status:"paid",paidAt:new Date()});
+        toast("Marked as paid","ok");
+        await loadOrders();
+      }catch(e){toast("Could not update: "+e.message,"err");}
+      break;
+    }
+    case "markReady": {
+      if(!id) break;
+      try{
+        await updateDoc(doc(db,"orders",id),{status:"ready"});
+        toast("Marked as ready","ok");
+        await loadOrders();
+      }catch(e){toast("Could not update: "+e.message,"err");}
+      break;
+    }
+    case "markCollected": {
+      if(!id) break;
+      try{
+        await updateDoc(doc(db,"orders",id),{status:"collected"});
+        toast("Marked as collected","ok");
+        await loadOrders();
+      }catch(e){toast("Could not update: "+e.message,"err");}
+      break;
+    }
+    case "cancelOrder": {
+      if(!id) break;
+      if(!(await confirmModal("Cancel this order?","The order will be marked cancelled.","Cancel order"))) break;
+      try{
+        await updateDoc(doc(db,"orders",id),{status:"cancelled"});
+        toast("Order cancelled","warn");
+        await loadOrders();
+      }catch(e){toast("Could not update: "+e.message,"err");}
+      break;
+    }
+    case "exportJson": {
+      const blob=new Blob([JSON.stringify(DRAFT,null,2)],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const el=document.createElement("a"); el.href=url;
+      el.download=`jayds-kitchen-backup-${new Date().toISOString().slice(0,10)}.json`;
+      el.click(); URL.revokeObjectURL(url); toast("Backup downloaded","ok"); break;
+    }
+    case "copyJson": {
+      try{await navigator.clipboard.writeText(JSON.stringify(DRAFT,null,2));toast("JSON copied","ok");}
+      catch{toast("Could not copy — try download","err");} break;
+    }
+    case "triggerImport": $("#importFile").click(); break;
+    case "resetAll":
+      if(!(await confirmModal("Reset everything?","All content will be replaced with defaults. Cannot be undone.","Reset")))break;
+      DRAFT=deepClone(DEFAULT_DATA); markDirty(); renderAll(); toast("Defaults restored — click Save","warn",5000); break;
+  }
+});
+
+$("#importFile").addEventListener("change",()=>{
+  const file=$("#importFile").files[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const p=JSON.parse(r.result);
+      DRAFT=mergeDeep(deepClone(DEFAULT_DATA),p);
+      markDirty(); renderAll(); toast("Backup loaded — click Save","ok",5000);
+    }catch{toast("Invalid backup file","err");}
+  };
+  r.readAsText(file); $("#importFile").value="";
+});
+
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="s"){e.preventDefault();$("#saveBtn").click();}
+  if(e.key==="Escape"&&$("#modal").classList.contains("open")) $("#modalCancel").click();
+});
+</script>
+</body>
+</html>
